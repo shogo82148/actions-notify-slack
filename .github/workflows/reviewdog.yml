@@ -18,6 +18,7 @@ jobs:
           cache-dependency-path: "action/package-lock.json"
           cache: "npm"
       - run: npm ci
+        working-directory: action
       - uses: reviewdog/action-eslint@v1
         with:
           reporter: github-pr-review
