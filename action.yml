@@ -1,0 +1,11 @@
+name: "Actions Notify Slack"
+description: "Provide a description here"
+author: "ICHINOSE Shogo"
+inputs:
+  milliseconds: # change this
+    required: true
+    description: "input description here"
+    default: "default value if applicable"
+runs:
+  using: "node20"
+  main: "action/dist/index.js"
