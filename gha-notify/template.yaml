@@ -17,3 +17,5 @@ Resources:
         AuthType: NONE
       Policies:
         - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
+        - SSMParameterWithSlashPrefixReadPolicy:
+            ParameterName: "/slack/*"
