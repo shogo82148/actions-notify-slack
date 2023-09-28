@@ -19,6 +19,8 @@ Resources:
         - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
         - SSMParameterWithSlashPrefixReadPolicy:
             ParameterName: "/slack/*"
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SlackAccessTokenTable
 
   ###### DynamoDB Tables ######
   SlackAccessTokenTable:
