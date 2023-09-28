@@ -19,3 +19,21 @@ Resources:
         - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
         - SSMParameterWithSlashPrefixReadPolicy:
             ParameterName: "/slack/*"
+
+  ###### DynamoDB Tables ######
+  SlackAccessTokenTable:
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: slack-access-token
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: team_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: team_id
+          KeyType: HASH
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
