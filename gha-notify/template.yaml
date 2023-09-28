@@ -13,5 +13,7 @@ Resources:
       Runtime: provided.al2
       Architectures: [arm64]
       Tracing: Active
+      FunctionUrlConfig:
+        AuthType: NONE
       Policies:
         - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
