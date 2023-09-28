@@ -8,4 +8,4 @@ test:
 
 .PHONY: build-NotifyFunction
 build-NotifyFunction:
-	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o $(ARTIFACTS_DIR)/notify -tags lambda.norpc ./cmd/notify
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o $(ARTIFACTS_DIR)/bootstrap -tags lambda.norpc ./cmd/notify
