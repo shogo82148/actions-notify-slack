@@ -25,6 +25,19 @@ jobs:
         run: |
           npm run all
 
+  gha-notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version-file: "gha-notify/go.mod"
+          cache-dependency-path: "gha-notify/go.sum"
+      - name: test
+        working-directory: gha-notify
+        run: |
+          make test
+
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
