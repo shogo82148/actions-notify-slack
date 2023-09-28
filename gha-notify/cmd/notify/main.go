@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"io"
 	"log/slog"
 	"net/http"
 	"os"
 
+	"github.com/shogo82148/actions-notify-slack/gha-notify/internal"
 	"github.com/shogo82148/aws-xray-yasdk-go/xray/xrayslog"
 	httplogger "github.com/shogo82148/go-http-logger"
 	"github.com/shogo82148/ridgenative"
@@ -29,8 +31,15 @@ func main() {
 		io.WriteString(w, "Hello, World!\n")
 	})
 
+	callback, err := internal.NewCallbackHandler(context.Background())
+	if err != nil {
+		slog.Error("failed to initialize the callback handler", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	mux.Handle("/callback", callback)
+
 	logger := httplogger.NewSlogLogger(slog.LevelInfo, "http access log", logger)
-	err := ridgenative.ListenAndServe(":8080", httplogger.LoggingHandler(logger, mux))
+	err = ridgenative.ListenAndServe(":8080", httplogger.LoggingHandler(logger, mux))
 	if err != nil {
 		slog.Error("failed to listen and serve: %v", err)
 		os.Exit(1)
