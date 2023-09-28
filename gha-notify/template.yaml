@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: GitHub Actions Notification
+
+Resources:
+  NotifyFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      CodeUri: .
+      Handler: notify
+      Runtime: provided.al2
+      Architectures: [arm64]
+      Tracing: Active
+      Policies:
+        - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
