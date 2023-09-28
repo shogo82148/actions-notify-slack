@@ -21,4 +21,5 @@ jobs:
         with:
           reporter: github-pr-review
           level: warning
-          eslint_flags: "action/src/**/*.ts"
+          eslint_flags: "src/**/*.ts"
+          workdir: "action"
