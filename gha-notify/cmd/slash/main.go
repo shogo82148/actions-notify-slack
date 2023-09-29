@@ -1,18 +1,18 @@
 package main
 
 import (
-	"context"
 	"log/slog"
+	"os"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/slack-go/slack"
+	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/handler"
 )
 
-func hello(ctx context.Context, slash *slack.SlashCommand) (string, error) {
-	slog.InfoContext(ctx, "slash command", slog.String("command", slash.Command), slog.String("text", slash.Text))
-	return "Hello λ!", nil
-}
-
 func main() {
-	lambda.Start(hello)
+	h, err := handler.NewSlashCommandHandler(&handler.SlashCommandHandlerConfig{})
+	if err != nil {
+		slog.Error("failed to initialize the handler", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	lambda.Start(h.Handle)
 }
