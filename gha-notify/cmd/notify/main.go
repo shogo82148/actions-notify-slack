@@ -54,7 +54,13 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	}
 	svcDynamoDB := dynamodb.NewFromConfig(cfg)
 	svcSSM := ssm.NewFromConfig(cfg)
-	_ = svcSSM
+
+	params, err := database.NewParameters(&database.ParametersConfig{
+		SSMParameterGetter: svcSSM,
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	slackAccessTokenTable, err := database.NewSlackAccessTokenTable(&database.SlackAccessTokenTableConfig{
 		DynamoDBItemPutter: svcDynamoDB,
@@ -65,14 +71,16 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 		return nil, err
 	}
 
-	_ = slackAccessTokenTable
-
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "Hello, World!\n")
 	})
 
-	callback, err := internal.NewCallbackHandler(context.Background())
+	callback, err := handler.NewCallbackHandler(&handler.CallbackHandlerConfig{
+		SlackClientIDGetter:     params,
+		SlackClientSecretGetter: params,
+		SlackAccessTokenPutter:  slackAccessTokenTable,
+	})
 	if err != nil {
 		return nil, err
 	}
