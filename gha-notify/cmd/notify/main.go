@@ -38,6 +38,13 @@ func main() {
 	}
 	mux.Handle("/callback", callback)
 
+	notifyHandler, err := internal.NewNotifyHandler(context.Background())
+	if err != nil {
+		slog.Error("failed to initialize the notify handler", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	mux.Handle("/notify", notifyHandler)
+
 	logger := httplogger.NewSlogLogger(slog.LevelInfo, "http access log", logger)
 	err = ridgenative.ListenAndServe(":8080", httplogger.LoggingHandler(logger, mux))
 	if err != nil {
