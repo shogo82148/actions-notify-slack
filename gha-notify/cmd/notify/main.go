@@ -45,6 +45,13 @@ func main() {
 	}
 	mux.Handle("/notify", notifyHandler)
 
+	webhook, err := internal.NewWebhook(context.Background())
+	if err != nil {
+		slog.Error("failed to initialize the webhook", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	mux.Handle("/slash", webhook)
+
 	logger := httplogger.NewSlogLogger(slog.LevelInfo, "http access log", logger)
 	err = ridgenative.ListenAndServe(":8080", httplogger.LoggingHandler(logger, mux))
 	if err != nil {
