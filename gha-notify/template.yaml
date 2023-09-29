@@ -15,6 +15,29 @@ Resources:
       Tracing: Active
       FunctionUrlConfig:
         AuthType: NONE
+      Environment:
+        Variables:
+          SLASH_FUNCTION_NAME: !Ref SlashFunction
+      Policies:
+        - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
+        - LambdaInvokePolicy:
+            FunctionName: !Ref SlashFunction
+        - SSMParameterWithSlashPrefixReadPolicy:
+            ParameterName: "/slack/*"
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SlackAccessTokenTable
+
+  # SlashFunction handles slash commands from Slack.
+  SlashFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      CodeUri: .
+      Handler: slash
+      Runtime: provided.al2
+      Architectures: [arm64]
+      Tracing: Active
       Policies:
         - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
         - SSMParameterWithSlashPrefixReadPolicy:
