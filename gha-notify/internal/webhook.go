@@ -2,12 +2,16 @@ package internal
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"log/slog"
 	"net/http"
+	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/lambda"
+	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/shogo82148/aws-xray-yasdk-go/xray"
 	"github.com/slack-go/slack"
@@ -15,6 +19,7 @@ import (
 
 type Webhook struct {
 	signingSecret string
+	lambda        *lambda.Client
 }
 
 func NewWebhook(ctx context.Context) (*Webhook, error) {
@@ -38,6 +43,7 @@ func NewWebhook(ctx context.Context) (*Webhook, error) {
 
 	return &Webhook{
 		signingSecret: aws.ToString(signingSecretParam.Parameter.Value),
+		lambda:        lambda.NewFromConfig(cfg),
 	}, nil
 }
 
@@ -63,7 +69,22 @@ func (h *Webhook) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: handle the slash command
-	slog.InfoContext(ctx, "slash command", slog.String("command", s.Command), slog.String("text", s.Text))
+	// handle the slash command
+	payload, err := json.Marshal(s)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	arn := os.Getenv("SLASH_FUNCTION_NAME")
+	_, err = h.lambda.Invoke(ctx, &lambda.InvokeInput{
+		FunctionName:   aws.String(arn),
+		InvocationType: types.InvocationTypeEvent,
+		Payload:        payload,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 }
