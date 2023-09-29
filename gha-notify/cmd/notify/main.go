@@ -7,8 +7,14 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal"
+	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/database"
+	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/handler"
 	"github.com/shogo82148/aws-xray-yasdk-go/xray/xrayslog"
+	"github.com/shogo82148/aws-xray-yasdk-go/xrayaws-v2"
 	httplogger "github.com/shogo82148/go-http-logger"
 	"github.com/shogo82148/ridgenative"
 )
@@ -26,31 +32,12 @@ func init() {
 }
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "Hello, World!\n")
-	})
-
-	callback, err := internal.NewCallbackHandler(context.Background())
+	ctx := context.Background()
+	mux, err := NewMux(ctx)
 	if err != nil {
-		slog.Error("failed to initialize the callback handler", slog.String("error", err.Error()))
+		slog.Error("failed to initialize the mux", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
-	mux.Handle("/callback", callback)
-
-	notifyHandler, err := internal.NewNotifyHandler(context.Background())
-	if err != nil {
-		slog.Error("failed to initialize the notify handler", slog.String("error", err.Error()))
-		os.Exit(1)
-	}
-	mux.Handle("/notify", notifyHandler)
-
-	webhook, err := internal.NewWebhook(context.Background())
-	if err != nil {
-		slog.Error("failed to initialize the webhook", slog.String("error", err.Error()))
-		os.Exit(1)
-	}
-	mux.Handle("/slash", webhook)
 
 	logger := httplogger.NewSlogLogger(slog.LevelInfo, "http access log", logger)
 	err = ridgenative.ListenAndServe(":8080", httplogger.LoggingHandler(logger, mux))
@@ -58,4 +45,53 @@ func main() {
 		slog.Error("failed to listen and serve: %v", err)
 		os.Exit(1)
 	}
+}
+
+func NewMux(ctx context.Context) (http.Handler, error) {
+	cfg, err := config.LoadDefaultConfig(ctx, xrayaws.WithXRay())
+	if err != nil {
+		return nil, err
+	}
+	svcDynamoDB := dynamodb.NewFromConfig(cfg)
+	svcSSM := ssm.NewFromConfig(cfg)
+	_ = svcSSM
+
+	slackAccessTokenTable, err := database.NewSlackAccessTokenTable(&database.SlackAccessTokenTableConfig{
+		DynamoDBItemPutter: svcDynamoDB,
+		DynamoDBItemGetter: svcDynamoDB,
+		TableName:          "slack-access-token",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_ = slackAccessTokenTable
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "Hello, World!\n")
+	})
+
+	callback, err := internal.NewCallbackHandler(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	mux.Handle("/callback", callback)
+
+	notifyHandler, err := handler.NewNotifyHandler(&handler.NotifyHandlerConfig{
+		SlackAccessTokenGetter: slackAccessTokenTable,
+		SlackAccessTokenPutter: slackAccessTokenTable,
+	})
+	if err != nil {
+		return nil, err
+	}
+	mux.Handle("/notify", notifyHandler)
+
+	webhook, err := internal.NewWebhook(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	mux.Handle("/slash", webhook)
+
+	return mux, nil
 }

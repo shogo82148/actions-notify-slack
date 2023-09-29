@@ -21,6 +21,9 @@
 			"**/Thumbs.db": true,
 			"/action": true,
 			"/gha-notify": true,
-		}
+		},
+		"cSpell.words": [
+			"xrayaws"
+		]
 	}
 }
