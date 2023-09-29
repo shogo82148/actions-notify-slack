@@ -9,8 +9,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
-	"github.com/shogo82148/actions-notify-slack/gha-notify/internal"
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/database"
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/handler"
 	"github.com/shogo82148/aws-xray-yasdk-go/xray/xrayslog"
@@ -54,6 +54,7 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	}
 	svcDynamoDB := dynamodb.NewFromConfig(cfg)
 	svcSSM := ssm.NewFromConfig(cfg)
+	svcLambda := lambda.NewFromConfig(cfg)
 
 	params, err := database.NewParameters(&database.ParametersConfig{
 		SSMParameterGetter: svcSSM,
@@ -95,11 +96,15 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	}
 	mux.Handle("/notify", notifyHandler)
 
-	webhook, err := internal.NewWebhook(context.Background())
+	slash, err := handler.NewSlashHandler(&handler.SlashHandlerConfig{
+		SlackSigningSecretGetter: params,
+		LambdaInvoker:            svcLambda,
+		SlashFunctionName:        os.Getenv("SLASH_FUNCTION_NAME"),
+	})
 	if err != nil {
 		return nil, err
 	}
-	mux.Handle("/slash", webhook)
+	mux.Handle("/slash", slash)
 
 	return mux, nil
 }

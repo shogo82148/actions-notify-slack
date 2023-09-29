@@ -21,3 +21,13 @@ type GetSlackClientSecretInput struct{}
 type GetSlackClientSecretOutput struct {
 	SlackClientSecret string
 }
+
+type SlackSigningSecretGetter interface {
+	GetSlackSigningSecret(ctx context.Context, input *GetSlackSigningSecretInput) (*GetSlackSigningSecretOutput, error)
+}
+
+type GetSlackSigningSecretInput struct{}
+
+type GetSlackSigningSecretOutput struct {
+	SlackSigningSecret string
+}

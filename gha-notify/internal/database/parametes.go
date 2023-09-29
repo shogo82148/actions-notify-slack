@@ -12,6 +12,8 @@ import (
 )
 
 var _ repository.SlackClientIDGetter = (*Parameters)(nil)
+var _ repository.SlackClientSecretGetter = (*Parameters)(nil)
+var _ repository.SlackSigningSecretGetter = (*Parameters)(nil)
 
 type Parameters struct {
 	g   memoize.Group[string, string]
@@ -58,5 +60,15 @@ func (p *Parameters) GetSlackClientSecret(ctx context.Context, _ *repository.Get
 	}
 	return &repository.GetSlackClientSecretOutput{
 		SlackClientSecret: v,
+	}, nil
+}
+
+func (p *Parameters) GetSlackSigningSecret(ctx context.Context, _ *repository.GetSlackSigningSecretInput) (*repository.GetSlackSigningSecretOutput, error) {
+	v, _, err := p.g.Do(ctx, "/slack/signing_secret", p.getParameter)
+	if err != nil {
+		return nil, err
+	}
+	return &repository.GetSlackSigningSecretOutput{
+		SlackSigningSecret: v,
 	}, nil
 }
