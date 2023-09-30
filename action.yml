@@ -1,11 +1,16 @@
 name: "Actions Notify Slack"
-description: "Provide a description here"
+description: "Notify to Slack"
 author: "ICHINOSE Shogo"
 inputs:
-  milliseconds: # change this
+  team-id:
     required: true
-    description: "input description here"
-    default: "default value if applicable"
+    description: "team id of slack"
+  channel-id:
+    required: true
+    description: "channel id of slack"
+  payload:
+    required: false
+    description: "JSON payload to send to Slack"
 runs:
   using: "node20"
   main: "action/dist/index.js"
