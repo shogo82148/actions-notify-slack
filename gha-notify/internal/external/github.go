@@ -2,8 +2,10 @@ package external
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/model"
@@ -75,6 +77,9 @@ func (g *GitHub) ParseGitHubIDToken(ctx context.Context, input *service.ParseGit
 	// verify the ID token
 	if token.Claims.Issuer != oidcIssuer {
 		return nil, fmt.Errorf("github: invalid issuer %q", token.Claims.Issuer)
+	}
+	if !slices.Contains(token.Claims.Audience, input.Audience) {
+		return nil, errors.New("github: invalid audience")
 	}
 
 	var claims model.ActionsIDToken
