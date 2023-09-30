@@ -23,6 +23,26 @@ type GetOAuthV2ResponseOutput struct {
 	ExpiresIn    int
 }
 
+type OAuthV2ResponseRefresher interface {
+	RefreshOAuthV2Response(ctx context.Context, input *RefreshOAuthV2ResponseInput) (*RefreshOAuthV2ResponseOutput, error)
+}
+
+type RefreshOAuthV2ResponseInput struct {
+	ClientID     string
+	ClientSecret string
+	RefreshToken string
+}
+
+type RefreshOAuthV2ResponseOutput struct {
+	AccessToken  string
+	TokenType    string
+	Scope        string
+	BotUserID    string
+	TeamID       string
+	RefreshToken string
+	ExpiresIn    int
+}
+
 type SlackWebhookPoster interface {
 	PostSlackWebhook(ctx context.Context, input *PostSlackWebhookInput) (*PostSlackWebhookOutput, error)
 }

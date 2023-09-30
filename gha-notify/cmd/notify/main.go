@@ -102,8 +102,11 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	mux.Handle("/callback", callback)
 
 	notifyHandler, err := handler.NewNotifyHandler(&handler.NotifyHandlerConfig{
-		SlackAccessTokenGetter: slackAccessTokenTable,
-		SlackAccessTokenPutter: slackAccessTokenTable,
+		OAuthV2ResponseRefresher: svcSlack,
+		SlackClientIDGetter:      params,
+		SlackClientSecretGetter:  params,
+		SlackAccessTokenGetter:   slackAccessTokenTable,
+		SlackAccessTokenPutter:   slackAccessTokenTable,
 	})
 	if err != nil {
 		return nil, err

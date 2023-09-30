@@ -9,6 +9,8 @@ import (
 )
 
 var _ service.SlackWebhookPoster = (*Slack)(nil)
+var _ service.OAuthV2ResponseGetter = (*Slack)(nil)
+var _ service.OAuthV2ResponseRefresher = (*Slack)(nil)
 
 type Slack struct {
 	cfg *SlackConfig
@@ -29,6 +31,23 @@ func (s *Slack) GetOAuthV2Response(ctx context.Context, input *service.GetOAuthV
 		return nil, err
 	}
 	return &service.GetOAuthV2ResponseOutput{
+		AccessToken:  resp.AccessToken,
+		TokenType:    resp.TokenType,
+		Scope:        resp.Scope,
+		BotUserID:    resp.BotUserID,
+		TeamID:       resp.Team.ID,
+		RefreshToken: resp.RefreshToken,
+		ExpiresIn:    resp.ExpiresIn,
+	}, nil
+}
+
+func (s *Slack) RefreshOAuthV2Response(ctx context.Context, input *service.RefreshOAuthV2ResponseInput) (*service.RefreshOAuthV2ResponseOutput, error) {
+	resp, err := slack.RefreshOAuthV2TokenContext(ctx, s.cfg.HTTPClient, input.ClientID, input.ClientSecret, input.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return &service.RefreshOAuthV2ResponseOutput{
 		AccessToken:  resp.AccessToken,
 		TokenType:    resp.TokenType,
 		Scope:        resp.Scope,
