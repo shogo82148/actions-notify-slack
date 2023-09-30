@@ -32,5 +32,5 @@ export async function notify(params: NotifyParams): Promise<void> {
   payload.channel = params.channelId;
 
   const client = new http.HttpClient("actions-notify-slack");
-  await client.postJson(defaultEndpoint, payload, headers);
+  await client.postJson(defaultEndpoint + "/notify", payload, headers);
 }
