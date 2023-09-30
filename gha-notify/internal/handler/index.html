@@ -4,10 +4,39 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Actions Notify Slack</title>
+    <title>Notify Slack GitHub Action</title>
 </head>
 
 <body>
+    <h1>Notify Slack GitHub Action</h1>
+    <a href="https://github.com/shogo82148/actions-notify-slack">Notify Slack GitHub Action</a> is a simple GitHub
+    Action to notify Slack.
+    {{ if .TeamID }}
+    <p>You are signed in to the workspace {{ .TeamName }}.</p>
+    <p>Your team id is <code>{{ .TeamID }}</code></p>
+    <p>Next,</p>
+    <ol>
+        <li>Invite @actions-notify-slack bot into your channel.</li>
+        <li>Grant the write permission to your repository by calling the slash command
+            <code>/gha-notify ORG/REPO</code>.
+        </li>
+        <li>Add the following step to your workflow.
+            <code>
+<pre>
+- uses: @shogo82148/actions-notify-slack@v1
+  with:
+    team-id: {{ .TeamID }}
+    channel-id: C1234567890
+    payload: |
+      {"text": "Hello, world!"}
+</pre>
+            </code>
+        </li>
+    </ol>
+    <p>Or you need to add the action into another workspace:</p>
+    {{ else }}
+    <p>To install the action, click the following button:</p>
+    {{ end }}
     <a
         href="https://slack.com/oauth/v2/authorize?client_id={{ .ClientID }}&scope=chat:write,commands&user_scope=&state={{ .State }}"><img
             alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png"
