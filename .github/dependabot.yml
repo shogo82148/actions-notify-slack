@@ -19,6 +19,12 @@ updates:
           # update too often, ignore patch releases
           - "version-update:semver-patch"
 
+  # Maintain dependencies for Go
+  - package-ecosystem: "gomod"
+    directory: "gha-notify"
+    schedule:
+      interval: "daily"
+
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
