@@ -67,7 +67,13 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	_ = svcSlack
+
+	svcGitHub, err := external.NewGitHub(&external.GitHubConfig{
+		HTTPClient: httpClient,
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	params, err := database.NewParameters(&database.ParametersConfig{
 		SSMParameterGetter: svcSSM,
@@ -104,6 +110,7 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	notifyHandler, err := handler.NewNotifyHandler(&handler.NotifyHandlerConfig{
 		OAuthV2ResponseRefresher: svcSlack,
 		SlackMessagePoster:       svcSlack,
+		GitHubIDTokenParser:      svcGitHub,
 		SlackClientIDGetter:      params,
 		SlackClientSecretGetter:  params,
 		SlackAccessTokenGetter:   slackAccessTokenTable,
