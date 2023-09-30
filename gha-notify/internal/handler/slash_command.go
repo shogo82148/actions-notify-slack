@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"regexp"
 	"strings"
 
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/repository"
@@ -18,6 +19,7 @@ type SlashCommandHandler struct {
 type SlashCommandHandlerConfig struct {
 	service.SlackWebhookPoster
 	repository.SlackPermissionGetter
+	repository.SlackPermissionAllower
 }
 
 func NewSlashCommandHandler(cfg *SlashCommandHandlerConfig) (*SlashCommandHandler, error) {
@@ -40,11 +42,17 @@ func (h *SlashCommandHandler) Handle(ctx context.Context, slash *slack.SlashComm
 
 func (h *SlashCommandHandler) handle(ctx context.Context, slash *slack.SlashCommand) error {
 	text := strings.TrimSpace(slash.Text)
-	if text == "" || text == "help" {
+	args := regexp.MustCompile(`\s+`).Split(text, -1)
+	if len(args) == 0 {
 		return h.handleHelp(ctx, slash)
 	}
-	if text == "list" {
+	switch args[0] {
+	case "help":
+		return h.handleHelp(ctx, slash)
+	case "list":
 		return h.handleList(ctx, slash)
+	case "allow":
+		return h.handleAllow(ctx, slash, args[1:])
 	}
 	return nil
 }
@@ -79,9 +87,24 @@ func (h *SlashCommandHandler) handleList(ctx context.Context, slash *slack.Slash
 		text.WriteString(permission)
 		text.WriteString("\n")
 	}
-	h.cfg.PostSlackWebhook(ctx, &service.PostSlackWebhookInput{
+	_, err = h.cfg.PostSlackWebhook(ctx, &service.PostSlackWebhookInput{
 		WebhookURL: slash.ResponseURL,
 		Text:       text.String(),
 	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *SlashCommandHandler) handleAllow(ctx context.Context, slash *slack.SlashCommand, args []string) error {
+	_, err := h.cfg.AllowSlackPermission(ctx, &repository.AllowSlackPermissionInput{
+		TeamID:    slash.TeamID,
+		ChannelID: slash.ChannelID,
+		Repos:     args,
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }

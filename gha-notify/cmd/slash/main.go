@@ -65,7 +65,8 @@ func newHandler(ctx context.Context) (*handler.SlashCommandHandler, error) {
 	}
 
 	return handler.NewSlashCommandHandler(&handler.SlashCommandHandlerConfig{
-		SlackWebhookPoster:    svcSlack,
-		SlackPermissionGetter: slackPermissionTable,
+		SlackWebhookPoster:     svcSlack,
+		SlackPermissionGetter:  slackPermissionTable,
+		SlackPermissionAllower: slackPermissionTable,
 	})
 }

@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/repository"
@@ -28,7 +29,7 @@ func NewSlackPermissionTable(cfg *SlackPermissionTableConfig) (*SlackPermissionT
 
 func (t *SlackPermissionTable) GetSlackPermission(ctx context.Context, input *repository.GetSlackPermissionInput) (*repository.GetSlackPermissionOutput, error) {
 	out, err := t.cfg.GetItem(ctx, &dynamodb.GetItemInput{
-		TableName: &t.cfg.TableName,
+		TableName: aws.String(t.cfg.TableName),
 		Key: map[string]types.AttributeValue{
 			"team_id": &types.AttributeValueMemberS{
 				Value: input.TeamID,
@@ -63,4 +64,28 @@ func (t *SlackPermissionTable) GetSlackPermission(ctx context.Context, input *re
 		ChannelID: channelID,
 		Repos:     repos,
 	}, nil
+}
+
+func (t *SlackPermissionTable) AllowSlackPermission(ctx context.Context, input *repository.AllowSlackPermissionInput) (*repository.AllowSlackPermissionOutput, error) {
+	_, err := t.cfg.UpdateItem(ctx, &dynamodb.UpdateItemInput{
+		TableName: aws.String(t.cfg.TableName),
+		Key: map[string]types.AttributeValue{
+			"team_id": &types.AttributeValueMemberS{
+				Value: input.TeamID,
+			},
+			"channel_id": &types.AttributeValueMemberS{
+				Value: input.ChannelID,
+			},
+		},
+		UpdateExpression: aws.String("ADD repos :repo"),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":repo": &types.AttributeValueMemberSS{
+				Value: input.Repos,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &repository.AllowSlackPermissionOutput{}, nil
 }
