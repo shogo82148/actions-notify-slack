@@ -91,6 +91,16 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 		return nil, err
 	}
 
+	slackPermissionTable, err := database.NewSlackPermissionTable(&database.SlackPermissionTableConfig{
+		DynamoDBItemPutter:  svcDynamoDB,
+		DynamoDBItemGetter:  svcDynamoDB,
+		DynamoDBItemUpdater: svcDynamoDB,
+		TableName:           "slack-permission",
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "Hello, World!\n")
@@ -115,6 +125,7 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 		SlackClientSecretGetter:  params,
 		SlackAccessTokenGetter:   slackAccessTokenTable,
 		SlackAccessTokenPutter:   slackAccessTokenTable,
+		SlackPermissionGetter:    slackPermissionTable,
 	})
 	if err != nil {
 		return nil, err
