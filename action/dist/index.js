@@ -94,7 +94,7 @@ function isIdTokenAvailable() {
 async function notify(params) {
     const defaultEndpoint = "https://c3jvaj2wbqe7kjw7rrsacfloku0popqs.lambda-url.us-east-1.on.aws";
     if (!isIdTokenAvailable()) {
-        core.error(`OIDC provider is not available. please enable it. see https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect`);
+        core.setFailed(`OIDC provider is not available. please enable it. see https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect`);
         return;
     }
     const headers = {};
@@ -104,7 +104,7 @@ async function notify(params) {
     payload.team = params.teamId;
     payload.channel = params.channelId;
     const client = new http.HttpClient("actions-notify-slack");
-    await client.postJson(defaultEndpoint, payload, headers);
+    await client.postJson(defaultEndpoint + "/notify", payload, headers);
 }
 exports.notify = notify;
 
