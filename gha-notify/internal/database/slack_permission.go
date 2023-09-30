@@ -42,10 +42,21 @@ func (t *SlackPermissionTable) GetSlackPermission(ctx context.Context, input *re
 		return nil, err
 	}
 
+	if _, ok := out.Item["repos"]; !ok {
+		return &repository.GetSlackPermissionOutput{
+			TeamID:    input.TeamID,
+			ChannelID: input.ChannelID,
+			Repos:     []string{},
+		}, nil
+	}
+
 	conv := new(attrConverter)
 	teamID := conv.convertString(out.Item["team_id"])
 	channelID := conv.convertString(out.Item["channel_id"])
 	repos := conv.convertStringSet(out.Item["repos"])
+	if conv.err != nil {
+		return nil, conv.err
+	}
 
 	return &repository.GetSlackPermissionOutput{
 		TeamID:    teamID,
