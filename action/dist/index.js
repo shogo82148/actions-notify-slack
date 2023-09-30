@@ -31,19 +31,22 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
-const wait_1 = __nccwpck_require__(817);
+const notify_1 = __nccwpck_require__(652);
 async function run() {
     try {
-        const ms = core.getInput("milliseconds");
-        core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-        core.debug(new Date().toTimeString());
-        await (0, wait_1.wait)(parseInt(ms, 10));
-        core.debug(new Date().toTimeString());
-        core.setOutput("time", new Date().toTimeString());
+        await (0, notify_1.notify)({
+            payload: core.getInput("payload"),
+            teamId: core.getInput("team-id"),
+            channelId: core.getInput("channel-id"),
+        });
     }
     catch (error) {
-        if (error instanceof Error)
-            core.setFailed(error.message);
+        if (error instanceof Error) {
+            core.setFailed(error);
+        }
+        else {
+            core.setFailed(`${error}`);
+        }
     }
 }
 void run();
@@ -51,22 +54,59 @@ void run();
 
 /***/ }),
 
-/***/ 817:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 652:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.wait = void 0;
-async function wait(milliseconds) {
-    return new Promise((resolve) => {
-        if (isNaN(milliseconds)) {
-            throw new Error("milliseconds not a number");
-        }
-        setTimeout(() => resolve("done!"), milliseconds);
-    });
+exports.notify = void 0;
+const core = __importStar(__nccwpck_require__(186));
+const http = __importStar(__nccwpck_require__(255));
+function isIdTokenAvailable() {
+    const token = process.env["ACTIONS_ID_TOKEN_REQUEST_TOKEN"];
+    const url = process.env["ACTIONS_ID_TOKEN_REQUEST_URL"];
+    return token && url ? true : false;
 }
-exports.wait = wait;
+async function notify(params) {
+    const defaultEndpoint = "https://c3jvaj2wbqe7kjw7rrsacfloku0popqs.lambda-url.us-east-1.on.aws";
+    if (!isIdTokenAvailable()) {
+        core.setFailed(`OIDC provider is not available. please enable it. see https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect`);
+        return;
+    }
+    const headers = {};
+    const token = await core.getIDToken(defaultEndpoint);
+    headers["Authorization"] = `Bearer ${token}`;
+    const payload = JSON.parse(params.payload);
+    payload.team = params.teamId;
+    payload.channel = params.channelId;
+    const client = new http.HttpClient("actions-notify-slack");
+    await client.postJson(defaultEndpoint + "/notify", payload, headers);
+}
+exports.notify = notify;
 
 
 /***/ }),
