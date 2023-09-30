@@ -66,6 +66,14 @@ func (h *SlashCommandHandler) handleList(ctx context.Context, slash *slack.Slash
 		return err
 	}
 
+	if len(permissions.Repos) == 0 {
+		h.cfg.PostSlackWebhook(ctx, &service.PostSlackWebhookInput{
+			WebhookURL: slash.ResponseURL,
+			Text:       "no repositories",
+		})
+		return nil
+	}
+
 	var text strings.Builder
 	for _, permission := range permissions.Repos {
 		text.WriteString(permission)
