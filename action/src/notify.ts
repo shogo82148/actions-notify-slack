@@ -14,7 +14,7 @@ interface NotifyParams {
 }
 
 export async function notify(params: NotifyParams): Promise<void> {
-  const defaultEndpoint = "https://c3jvaj2wbqe7kjw7rrsacfloku0popqs.lambda-url.us-east-1.on.aws";
+  const defaultEndpoint = "https://gha-notify.shogo82148.com";
 
   if (!isIdTokenAvailable()) {
     core.setFailed(
