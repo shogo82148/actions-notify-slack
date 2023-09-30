@@ -103,6 +103,7 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 
 	notifyHandler, err := handler.NewNotifyHandler(&handler.NotifyHandlerConfig{
 		OAuthV2ResponseRefresher: svcSlack,
+		SlackMessagePoster:       svcSlack,
 		SlackClientIDGetter:      params,
 		SlackClientSecretGetter:  params,
 		SlackAccessTokenGetter:   slackAccessTokenTable,

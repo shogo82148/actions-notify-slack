@@ -2,12 +2,14 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"io"
 	"net/http"
 	"time"
 
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/repository"
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/service"
-	"github.com/slack-go/slack"
 )
 
 type NotifyHandler struct {
@@ -16,6 +18,7 @@ type NotifyHandler struct {
 
 type NotifyHandlerConfig struct {
 	service.OAuthV2ResponseRefresher
+	service.SlackMessagePoster
 	repository.SlackClientIDGetter
 	repository.SlackClientSecretGetter
 	repository.SlackAccessTokenGetter
@@ -38,9 +41,23 @@ func (h *NotifyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *NotifyHandler) handle(ctx context.Context, r *http.Request) error {
-	// TODO: get the parameters from the request
-	teamID := "T3G1HAY66"
-	channelD := "C3GMGG162"
+	// TODO: authorize the request
+
+	data, err := io.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+
+	var v map[string]any
+	if err := json.Unmarshal(data, &v); err != nil {
+		return newValidationError(err)
+	}
+
+	teamID, ok := v["team"].(string)
+	if !ok {
+		return newValidationError(errors.New("handler: required key team is not found"))
+	}
+	delete(v, "team")
 
 	token, err := h.getAccessToke(ctx, time.Now(), teamID)
 	if err != nil {
@@ -48,8 +65,10 @@ func (h *NotifyHandler) handle(ctx context.Context, r *http.Request) error {
 	}
 
 	// send a message
-	api := slack.New(token)
-	_, _, err = api.PostMessageContext(ctx, channelD, slack.MsgOptionText("Hello, World!", false))
+	h.cfg.PostSlackMessage(ctx, &service.PostSlackMessageInput{
+		Token:   token,
+		Message: v,
+	})
 	if err != nil {
 		return err
 	}

@@ -1,7 +1,10 @@
 package external
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/service"
@@ -65,4 +68,31 @@ func (s *Slack) PostSlackWebhook(ctx context.Context, input *service.PostSlackWe
 		ResponseType: input.ResponseType,
 	})
 	return nil, err
+}
+
+func (s *Slack) PostSlackMessage(ctx context.Context, input *service.PostSlackMessageInput) (*service.PostSlackMessageOutput, error) {
+	body, err := json.Marshal(input.Message)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://slack.com/api/chat.postMessage", bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+input.Token)
+
+	resp, err := s.cfg.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	io.Copy(io.Discard, resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, slack.StatusCodeError{Code: resp.StatusCode, Status: resp.Status}
+	}
+
+	return &service.PostSlackMessageOutput{}, nil
 }
