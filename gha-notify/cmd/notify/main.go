@@ -12,9 +12,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/database"
+	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/external"
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/handler"
+	"github.com/shogo82148/aws-xray-yasdk-go/xray/xraylog"
 	"github.com/shogo82148/aws-xray-yasdk-go/xray/xrayslog"
 	"github.com/shogo82148/aws-xray-yasdk-go/xrayaws-v2"
+	"github.com/shogo82148/aws-xray-yasdk-go/xrayhttp"
 	httplogger "github.com/shogo82148/go-http-logger"
 	"github.com/shogo82148/ridgenative"
 )
@@ -29,6 +32,7 @@ func init() {
 	h2 := xrayslog.NewHandler(h1, "trace_id")
 	logger = slog.New(h2)
 	slog.SetDefault(logger)
+	xraylog.SetLogger(xrayslog.NewXRayLogger(h2))
 }
 
 func main() {
@@ -55,6 +59,15 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	svcDynamoDB := dynamodb.NewFromConfig(cfg)
 	svcSSM := ssm.NewFromConfig(cfg)
 	svcLambda := lambda.NewFromConfig(cfg)
+
+	httpClient := xrayhttp.Client(nil)
+	svcSlack, err := external.NewSlack(&external.SlackConfig{
+		HTTPClient: httpClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	_ = svcSlack
 
 	params, err := database.NewParameters(&database.ParametersConfig{
 		SSMParameterGetter: svcSSM,
