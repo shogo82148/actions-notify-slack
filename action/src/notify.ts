@@ -17,7 +17,7 @@ export async function notify(params: NotifyParams): Promise<void> {
   const defaultEndpoint = "https://c3jvaj2wbqe7kjw7rrsacfloku0popqs.lambda-url.us-east-1.on.aws";
 
   if (!isIdTokenAvailable()) {
-    core.error(
+    core.setFailed(
       `OIDC provider is not available. please enable it. see https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect`,
     );
     return;
