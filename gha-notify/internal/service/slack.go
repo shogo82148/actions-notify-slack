@@ -20,6 +20,7 @@ type GetOAuthV2ResponseOutput struct {
 	Scope        string
 	BotUserID    string
 	TeamID       string
+	TeamName     string
 	RefreshToken string
 	ExpiresIn    int
 }
