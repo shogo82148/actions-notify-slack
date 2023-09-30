@@ -18,6 +18,8 @@ type CallbackHandlerConfig struct {
 	repository.SlackClientIDGetter
 	repository.SlackClientSecretGetter
 	repository.SlackAccessTokenPutter
+	repository.SessionGetter
+	repository.SessionPutter
 }
 
 func NewCallbackHandler(cfg *CallbackHandlerConfig) (*CallbackHandler, error) {

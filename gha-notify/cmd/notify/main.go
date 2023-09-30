@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"io"
 	"log/slog"
 	"net/http"
 	"os"
@@ -101,16 +100,34 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 		return nil, err
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "Hello, World!\n")
+	sessionTable, err := database.NewSessionTable(&database.SessionTableConfig{
+		DynamoDBItemPutter: svcDynamoDB,
+		DynamoDBItemGetter: svcDynamoDB,
+		TableName:          "session",
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	mux := http.NewServeMux()
+
+	index, err := handler.NewIndexHandler(&handler.IndexHandlerConfig{
+		SlackClientIDGetter: params,
+		SessionGetter:       sessionTable,
+		SessionPutter:       sessionTable,
+	})
+	if err != nil {
+		return nil, err
+	}
+	mux.Handle("/", index)
 
 	callback, err := handler.NewCallbackHandler(&handler.CallbackHandlerConfig{
 		OAuthV2ResponseGetter:   svcSlack,
 		SlackClientIDGetter:     params,
 		SlackClientSecretGetter: params,
 		SlackAccessTokenPutter:  slackAccessTokenTable,
+		SessionGetter:           sessionTable,
+		SessionPutter:           sessionTable,
 	})
 	if err != nil {
 		return nil, err

@@ -63,8 +63,8 @@ github.com/shogo82148/goat v0.0.6 h1:QmNrB8HnXOt7BFaS8i890aBo4RRbiXVWcgSagd97S7Q
 github.com/shogo82148/goat v0.0.6/go.mod h1:J5sGtFsP9R1Mh6OLSbCec8pVmXy3oQGaYUj12qtKg94=
 github.com/shogo82148/memoize v0.0.3 h1:dgPkeH6TM9Vu0hXC0UfeSBEIQVL6i0Q9nscBh5CJZAs=
 github.com/shogo82148/memoize v0.0.3/go.mod h1:sOsvhOlJGVR2nHgCzUchvbEeYB6jNvSP9o4SPHgb+bY=
-github.com/shogo82148/pointer v1.2.0 h1:MEPjAx9hK17sdEVhaqHROphdy+RxTH70vaBypZzZ/d8=
-github.com/shogo82148/pointer v1.2.0/go.mod h1:agZ5JFpavFPXznbWonIvbG78NDfvDTFppe+7o53up5w=
+github.com/shogo82148/pointer v1.3.0 h1:LW5V2jUAjFNjS8e7k/PgFoh3EavOSB/vvN85aGue5+I=
+github.com/shogo82148/pointer v1.3.0/go.mod h1:agZ5JFpavFPXznbWonIvbG78NDfvDTFppe+7o53up5w=
 github.com/shogo82148/ridgenative v1.4.0 h1:yBsshqKQ86Y155CzgW3iC34DPwpcClceCJ8JQBd36UE=
 github.com/shogo82148/ridgenative v1.4.0/go.mod h1:PInWLpQIV0RsZI3j81ZH87hQ2knhDiMGbeDuTli3QIE=
 github.com/slack-go/slack v0.12.3 h1:92/dfFU8Q5XP6Wp5rr5/T5JHLM5c5Smtn53fhToAP88=
