@@ -52,7 +52,8 @@ func (h *NotifyHandler) handle(ctx context.Context, r *http.Request) error {
 		return newValidationError(errors.New("handler: no authorization header"))
 	}
 	claims, err := h.cfg.ParseGitHubIDToken(ctx, &service.ParseGitHubIDTokenInput{
-		IDToken: bearer,
+		Audience: "https://" + r.Host,
+		IDToken:  bearer,
 	})
 	if err != nil {
 		return newValidationError(errors.New("handler: invalid authorization header"))

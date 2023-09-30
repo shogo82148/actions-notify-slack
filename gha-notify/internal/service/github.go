@@ -11,7 +11,8 @@ type GitHubIDTokenParser interface {
 }
 
 type ParseGitHubIDTokenInput struct {
-	IDToken string
+	Audience string
+	IDToken  string
 }
 
 type ParseGitHubIDTokenOutput struct {
