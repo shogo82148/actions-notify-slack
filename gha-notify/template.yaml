@@ -13,8 +13,9 @@ Resources:
       Runtime: provided.al2
       Architectures: [arm64]
       Tracing: Active
-      FunctionUrlConfig:
-        AuthType: NONE
+      Events:
+        CatchAll:
+          Type: HttpApi
       Environment:
         Variables:
           SLASH_FUNCTION_NAME: !Ref SlashFunction
@@ -28,6 +29,12 @@ Resources:
             TableName: !Ref SlackAccessTokenTable
         - DynamoDBReadPolicy:
             TableName: !Ref SlackPermissionTable
+
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: "gha-notify.shogo82148.com"
+      ValidationMethod: "DNS"
 
   # SlashFunction handles slash commands from Slack.
   SlashFunction:
