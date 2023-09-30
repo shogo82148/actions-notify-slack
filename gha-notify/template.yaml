@@ -16,6 +16,8 @@ Resources:
       Events:
         CatchAll:
           Type: HttpApi
+          Properties:
+            ApiId: !Ref NotifyApi
       Environment:
         Variables:
           SLASH_FUNCTION_NAME: !Ref SlashFunction
@@ -30,6 +32,14 @@ Resources:
         - DynamoDBReadPolicy:
             TableName: !Ref SlackPermissionTable
 
+  ###### configuration fo custom domain ######
+  NotifyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Description: API for GitHub Actions Notification
+      Domain:
+        CertificateArn: !Ref Certificate
+        DomainName: "gha-notify.shogo82148.com"
   Certificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
