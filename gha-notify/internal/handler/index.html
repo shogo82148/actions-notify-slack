@@ -23,10 +23,10 @@
         <li>Add the following step to your workflow.
             <code>
 <pre>
-- uses: @shogo82148/actions-notify-slack@v1
+- uses: @shogo82148/actions-notify-slack@v0
   with:
     team-id: {{ .TeamID }}
-    channel-id: C1234567890
+    channel-id: C1234567890 # replace this with your channel id
     payload: |
       {"text": "Hello, world!"}
 </pre>
