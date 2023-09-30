@@ -91,6 +91,7 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	})
 
 	callback, err := handler.NewCallbackHandler(&handler.CallbackHandlerConfig{
+		OAuthV2ResponseGetter:   svcSlack,
 		SlackClientIDGetter:     params,
 		SlackClientSecretGetter: params,
 		SlackAccessTokenPutter:  slackAccessTokenTable,
@@ -101,8 +102,12 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	mux.Handle("/callback", callback)
 
 	notifyHandler, err := handler.NewNotifyHandler(&handler.NotifyHandlerConfig{
-		SlackAccessTokenGetter: slackAccessTokenTable,
-		SlackAccessTokenPutter: slackAccessTokenTable,
+		OAuthV2ResponseRefresher: svcSlack,
+		SlackMessagePoster:       svcSlack,
+		SlackClientIDGetter:      params,
+		SlackClientSecretGetter:  params,
+		SlackAccessTokenGetter:   slackAccessTokenTable,
+		SlackAccessTokenPutter:   slackAccessTokenTable,
 	})
 	if err != nil {
 		return nil, err
