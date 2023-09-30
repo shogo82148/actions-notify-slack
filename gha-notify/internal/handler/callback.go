@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -28,25 +29,38 @@ func NewCallbackHandler(cfg *CallbackHandlerConfig) (*CallbackHandler, error) {
 
 func (h *CallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	code := r.URL.Query().Get("code")
-	if err := h.handle(ctx, code); err != nil {
+	header, err := h.handle(ctx, r)
+	if err != nil {
 		handleError(ctx, w, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.Header().Add("Set-Cookie", header)
+	w.Header().Add("Location", "/")
+	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-func (h *CallbackHandler) handle(ctx context.Context, code string) error {
+func (h *CallbackHandler) handle(ctx context.Context, r *http.Request) (string, error) {
 	now := time.Now()
+	code := r.URL.Query().Get("code")
+	state := r.URL.Query().Get("state")
+
+	// get the session
+	s, err := getSession(r, h.cfg.SessionGetter)
+	if err != nil {
+		return "", err
+	}
+	if s.SessionID == "" || s.State == "" || s.State != state {
+		return "", newValidationError(errors.New("handler: invalid session"))
+	}
 
 	clientID, err := h.cfg.GetSlackClientID(ctx, &repository.GetSlackClientIDInput{})
 	if err != nil {
-		return err
+		return "", err
 	}
 	clientSecret, err := h.cfg.GetSlackClientSecret(ctx, &repository.GetSlackClientSecretInput{})
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	resp, err := h.cfg.GetOAuthV2Response(ctx, &service.GetOAuthV2ResponseInput{
@@ -55,7 +69,7 @@ func (h *CallbackHandler) handle(ctx context.Context, code string) error {
 		Code:         code,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	expiresAt := now.Add(time.Duration(resp.ExpiresIn) * time.Second)
@@ -68,7 +82,19 @@ func (h *CallbackHandler) handle(ctx context.Context, code string) error {
 		ExpiresAt:    expiresAt,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+
+	// save the session
+	s = &session{
+		SessionID: newSessionID(),
+		State:     newState(),
+		TeamID:    resp.TeamID,
+		TeamName:  resp.TeamName,
+	}
+	header, err := putSession(r, h.cfg.SessionPutter, s)
+	if err != nil {
+		return "", err
+	}
+	return header, nil
 }

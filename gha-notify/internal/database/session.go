@@ -12,6 +12,9 @@ import (
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/service"
 )
 
+var _ repository.SessionPutter = (*SessionTable)(nil)
+var _ repository.SessionGetter = (*SessionTable)(nil)
+
 type SessionTable struct {
 	cfg *SessionTableConfig
 }

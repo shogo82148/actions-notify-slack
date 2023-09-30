@@ -39,6 +39,7 @@ func (s *Slack) GetOAuthV2Response(ctx context.Context, input *service.GetOAuthV
 		Scope:        resp.Scope,
 		BotUserID:    resp.BotUserID,
 		TeamID:       resp.Team.ID,
+		TeamName:     resp.Team.Name,
 		RefreshToken: resp.RefreshToken,
 		ExpiresIn:    resp.ExpiresIn,
 	}, nil

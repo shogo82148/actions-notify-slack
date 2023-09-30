@@ -2,17 +2,25 @@ package handler
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
+	_ "embed"
 	"encoding/hex"
+	"html/template"
 	"net/http"
+	"strconv"
 
 	"github.com/shogo82148/actions-notify-slack/gha-notify/internal/repository"
 )
 
 const sessionCookieName = "gha-notify-session-id"
 
+//go:embed index.html
+var indexTemplate string
+
 type IndexHandler struct {
-	cfg *IndexHandlerConfig
+	cfg  *IndexHandlerConfig
+	tmpl *template.Template
 }
 
 type IndexHandlerConfig struct {
@@ -22,16 +30,44 @@ type IndexHandlerConfig struct {
 }
 
 func NewIndexHandler(cfg *IndexHandlerConfig) (*IndexHandler, error) {
+	tmpl, err := template.New("index").Parse(indexTemplate)
+	if err != nil {
+		return nil, err
+	}
 	return &IndexHandler{
-		cfg: cfg,
+		cfg:  cfg,
+		tmpl: tmpl,
 	}, nil
 }
 
 func (h *IndexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s, err := getSession(r, h.cfg.SessionGetter)
+	ctx := r.Context()
+	body, header, err := h.render(ctx, r)
 	if err != nil {
 		handleError(r.Context(), w, err)
 		return
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Content-Length", strconv.Itoa(len(body)))
+	w.Header().Set("Set-Cookie", header)
+	w.WriteHeader(http.StatusOK)
+	w.Write(body)
+}
+
+type indexData struct {
+	ClientID  string
+	SessionID string
+	State     string
+	TeamID    string
+	TeamName  string
+}
+
+func (h *IndexHandler) render(ctx context.Context, r *http.Request) ([]byte, string, error) {
+	// get the session
+	s, err := getSession(r, h.cfg.SessionGetter)
+	if err != nil {
+		return nil, "", err
 	}
 	if s.SessionID == "" {
 		s.SessionID = newSessionID()
@@ -41,19 +77,27 @@ func (h *IndexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	header, err := putSession(r, h.cfg.SessionPutter, s)
 	if err != nil {
-		handleError(r.Context(), w, err)
-		return
+		return nil, "", err
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Header().Set("Set-Cookie", header)
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(s.SessionID))
-}
+	// get the client ID
+	clientID, err := h.cfg.GetSlackClientID(ctx, &repository.GetSlackClientIDInput{})
+	if err != nil {
+		return nil, "", err
+	}
 
-func (h *IndexHandler) render() ([]byte, error) {
+	data := &indexData{
+		ClientID:  clientID.SlackClientID,
+		SessionID: s.SessionID,
+		State:     s.State,
+		TeamID:    s.TeamID,
+		TeamName:  s.TeamName,
+	}
 	buf := new(bytes.Buffer)
-	return buf.Bytes(), nil
+	if err := h.tmpl.Execute(buf, data); err != nil {
+		return nil, "", err
+	}
+	return buf.Bytes(), header, nil
 }
 
 type session struct {
@@ -131,5 +175,3 @@ func getSessionID(req *http.Request) string {
 	}
 	return ""
 }
-
-// <a href="https://slack.com/oauth/v2/authorize?client_id=118051372210.5947954494951&scope=chat:write,commands&user_scope="><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>
