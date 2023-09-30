@@ -19,3 +19,10 @@ var _ DynamoDBItemGetter = (*dynamodb.Client)(nil)
 type DynamoDBItemGetter interface {
 	GetItem(ctx context.Context, params *dynamodb.GetItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.GetItemOutput, error)
 }
+
+var _ DynamoDBItemUpdater = (*dynamodb.Client)(nil)
+
+// DynamoDBItemUpdater is an interface for dynamodb.Client.UpdateItem.
+type DynamoDBItemUpdater interface {
+	UpdateItem(ctx context.Context, params *dynamodb.UpdateItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.UpdateItemOutput, error)
+}

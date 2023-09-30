@@ -42,6 +42,18 @@ func (c *attrConverter) convertNumber(attr types.AttributeValue) float64 {
 	return f
 }
 
+func (c *attrConverter) convertStringSet(attr types.AttributeValue) []string {
+	if c.err != nil {
+		return nil
+	}
+	ss, ok := attr.(*types.AttributeValueMemberSS)
+	if !ok {
+		c.err = fmt.Errorf("database: %T cannot convert into string set", attr)
+		return nil
+	}
+	return ss.Value
+}
+
 func timeToUnixTime(t time.Time) float64 {
 	unix := t.Unix()
 	nano := t.Nanosecond()
