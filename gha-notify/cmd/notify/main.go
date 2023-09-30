@@ -91,6 +91,7 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	})
 
 	callback, err := handler.NewCallbackHandler(&handler.CallbackHandlerConfig{
+		OAuthV2ResponseGetter:   svcSlack,
 		SlackClientIDGetter:     params,
 		SlackClientSecretGetter: params,
 		SlackAccessTokenPutter:  slackAccessTokenTable,
