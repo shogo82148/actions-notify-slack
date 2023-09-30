@@ -26,6 +26,8 @@ Resources:
             ParameterName: "/slack/*"
         - DynamoDBCrudPolicy:
             TableName: !Ref SlackAccessTokenTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref SlackPermissionTable
 
   # SlashFunction handles slash commands from Slack.
   SlashFunction:
@@ -44,6 +46,8 @@ Resources:
             ParameterName: "/slack/*"
         - DynamoDBCrudPolicy:
             TableName: !Ref SlackAccessTokenTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SlackPermissionTable
 
   ###### DynamoDB Tables ######
   SlackAccessTokenTable:
