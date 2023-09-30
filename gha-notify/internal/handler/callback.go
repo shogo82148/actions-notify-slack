@@ -21,6 +21,7 @@ type CallbackHandlerConfig struct {
 	repository.SlackAccessTokenPutter
 	repository.SessionGetter
 	repository.SessionPutter
+	repository.SessionDeleter
 }
 
 func NewCallbackHandler(cfg *CallbackHandlerConfig) (*CallbackHandler, error) {
@@ -86,6 +87,7 @@ func (h *CallbackHandler) handle(ctx context.Context, r *http.Request) (string, 
 	}
 
 	// save the session
+	oldSessionID := s.SessionID
 	s = &session{
 		SessionID: newSessionID(),
 		State:     newState(),
@@ -96,5 +98,10 @@ func (h *CallbackHandler) handle(ctx context.Context, r *http.Request) (string, 
 	if err != nil {
 		return "", err
 	}
+
+	// remove old one
+	h.cfg.DeleteSession(ctx, &repository.DeleteSessionInput{
+		SessionID: oldSessionID,
+	})
 	return header, nil
 }

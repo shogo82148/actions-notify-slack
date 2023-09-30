@@ -26,3 +26,10 @@ var _ DynamoDBItemUpdater = (*dynamodb.Client)(nil)
 type DynamoDBItemUpdater interface {
 	UpdateItem(ctx context.Context, params *dynamodb.UpdateItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.UpdateItemOutput, error)
 }
+
+var _ DynamoDBItemDeleter = (*dynamodb.Client)(nil)
+
+// DynamoDBItemDeleter is an interface for dynamodb.Client.DeleteItem.
+type DynamoDBItemDeleter interface {
+	DeleteItem(ctx context.Context, params *dynamodb.DeleteItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.DeleteItemOutput, error)
+}

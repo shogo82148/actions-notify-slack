@@ -32,3 +32,15 @@ type GetSessionOutput struct {
 	TeamID    string // team ID for Slack
 	TeamName  string // team name for Slack
 }
+
+// SessionDeleter is an interface for deleting session.
+type SessionDeleter interface {
+	DeleteSession(ctx context.Context, input *DeleteSessionInput) (*DeleteSessionOutput, error)
+}
+
+type DeleteSessionInput struct {
+	SessionID string
+}
+
+type DeleteSessionOutput struct {
+}

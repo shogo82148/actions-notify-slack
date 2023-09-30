@@ -22,6 +22,7 @@ type SessionTable struct {
 type SessionTableConfig struct {
 	service.DynamoDBItemPutter
 	service.DynamoDBItemGetter
+	service.DynamoDBItemDeleter
 	TableName string
 }
 
@@ -108,4 +109,20 @@ func (t *SessionTable) GetSession(ctx context.Context, input *repository.GetSess
 		TeamID:    teamID,
 		TeamName:  teamName,
 	}, nil
+}
+
+// DeleteSession deletes a session.
+func (t *SessionTable) DeleteSession(ctx context.Context, input *repository.DeleteSessionInput) (*repository.DeleteSessionOutput, error) {
+	_, err := t.cfg.DeleteItem(ctx, &dynamodb.DeleteItemInput{
+		TableName: aws.String(t.cfg.TableName),
+		Key: map[string]types.AttributeValue{
+			"session_id": &types.AttributeValueMemberS{
+				Value: input.SessionID,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
 }

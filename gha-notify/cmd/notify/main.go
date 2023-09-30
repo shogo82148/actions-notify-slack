@@ -101,9 +101,10 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	}
 
 	sessionTable, err := database.NewSessionTable(&database.SessionTableConfig{
-		DynamoDBItemPutter: svcDynamoDB,
-		DynamoDBItemGetter: svcDynamoDB,
-		TableName:          "session",
+		DynamoDBItemPutter:  svcDynamoDB,
+		DynamoDBItemGetter:  svcDynamoDB,
+		DynamoDBItemDeleter: svcDynamoDB,
+		TableName:           "session",
 	})
 	if err != nil {
 		return nil, err
@@ -128,6 +129,7 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 		SlackAccessTokenPutter:  slackAccessTokenTable,
 		SessionGetter:           sessionTable,
 		SessionPutter:           sessionTable,
+		SessionDeleter:          sessionTable,
 	})
 	if err != nil {
 		return nil, err
