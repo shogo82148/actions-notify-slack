@@ -67,7 +67,13 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	_ = svcSlack
+
+	svcGitHub, err := external.NewGitHub(&external.GitHubConfig{
+		HTTPClient: httpClient,
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	params, err := database.NewParameters(&database.ParametersConfig{
 		SSMParameterGetter: svcSSM,
@@ -80,6 +86,16 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 		DynamoDBItemPutter: svcDynamoDB,
 		DynamoDBItemGetter: svcDynamoDB,
 		TableName:          "slack-access-token",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	slackPermissionTable, err := database.NewSlackPermissionTable(&database.SlackPermissionTableConfig{
+		DynamoDBItemPutter:  svcDynamoDB,
+		DynamoDBItemGetter:  svcDynamoDB,
+		DynamoDBItemUpdater: svcDynamoDB,
+		TableName:           "slack-permission",
 	})
 	if err != nil {
 		return nil, err
@@ -104,10 +120,12 @@ func NewMux(ctx context.Context) (http.Handler, error) {
 	notifyHandler, err := handler.NewNotifyHandler(&handler.NotifyHandlerConfig{
 		OAuthV2ResponseRefresher: svcSlack,
 		SlackMessagePoster:       svcSlack,
+		GitHubIDTokenParser:      svcGitHub,
 		SlackClientIDGetter:      params,
 		SlackClientSecretGetter:  params,
 		SlackAccessTokenGetter:   slackAccessTokenTable,
 		SlackAccessTokenPutter:   slackAccessTokenTable,
+		SlackPermissionGetter:    slackPermissionTable,
 	})
 	if err != nil {
 		return nil, err
