@@ -13,8 +13,11 @@ Resources:
       Runtime: provided.al2
       Architectures: [arm64]
       Tracing: Active
-      FunctionUrlConfig:
-        AuthType: NONE
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref NotifyApi
       Environment:
         Variables:
           SLASH_FUNCTION_NAME: !Ref SlashFunction
@@ -28,6 +31,20 @@ Resources:
             TableName: !Ref SlackAccessTokenTable
         - DynamoDBReadPolicy:
             TableName: !Ref SlackPermissionTable
+
+  ###### configuration fo custom domain ######
+  NotifyApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Description: API for GitHub Actions Notification
+      Domain:
+        CertificateArn: !Ref Certificate
+        DomainName: "gha-notify.shogo82148.com"
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: "gha-notify.shogo82148.com"
+      ValidationMethod: "DNS"
 
   # SlashFunction handles slash commands from Slack.
   SlashFunction:

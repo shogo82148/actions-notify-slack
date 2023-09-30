@@ -92,7 +92,7 @@ function isIdTokenAvailable() {
     return token && url ? true : false;
 }
 async function notify(params) {
-    const defaultEndpoint = "https://c3jvaj2wbqe7kjw7rrsacfloku0popqs.lambda-url.us-east-1.on.aws";
+    const defaultEndpoint = "https://gha-notify.shogo82148.com";
     if (!isIdTokenAvailable()) {
         core.setFailed(`OIDC provider is not available. please enable it. see https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect`);
         return;
