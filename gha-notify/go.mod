@@ -13,7 +13,7 @@ require (
 	github.com/shogo82148/aws-xray-yasdk-go/xrayaws-v2 v1.1.4
 	github.com/shogo82148/go-http-logger v1.3.0
 	github.com/shogo82148/goat v0.0.6
-	github.com/shogo82148/memoize v0.0.3
+	github.com/shogo82148/memoize v0.0.4
 	github.com/shogo82148/ridgenative v1.4.0
 	github.com/slack-go/slack v0.12.3
 )
