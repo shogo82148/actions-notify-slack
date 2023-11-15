@@ -5,9 +5,9 @@ go 1.21.1
 require (
 	github.com/aws/aws-lambda-go v1.41.0
 	github.com/aws/aws-sdk-go-v2 v1.22.2
-	github.com/aws/aws-sdk-go-v2/config v1.24.0
+	github.com/aws/aws-sdk-go-v2/config v1.25.0
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.25.1
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.45.0
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.46.0
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.42.1
 	github.com/shogo82148/aws-xray-yasdk-go v1.7.2
 	github.com/shogo82148/aws-xray-yasdk-go/xrayaws-v2 v1.1.5
@@ -20,7 +20,7 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.5.0 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.15.2 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.16.0 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.14.3 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.2.2 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.5.2 // indirect
