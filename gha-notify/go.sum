@@ -52,8 +52,8 @@ github.com/jmespath/go-jmespath/internal/testify v1.5.1 h1:shLQSRRSCCPj3f2gpwzGw
 github.com/jmespath/go-jmespath/internal/testify v1.5.1/go.mod h1:L3OGu8Wl2/fWfCI6z80xFu9LTZmf1ZRjMHUOPmWr69U=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/shogo82148/aws-xray-yasdk-go v1.7.2 h1:iv8a87VDpw8CnzbAsqOCAk/SFVweZ9wivcOo7hivEG8=
-github.com/shogo82148/aws-xray-yasdk-go v1.7.2/go.mod h1:Ou0BdxWM2H5u5FAcTqYUn08XSv+opM56jDULW8MLCRA=
+github.com/shogo82148/aws-xray-yasdk-go v1.7.3 h1:ocIQ6vOey7Mzvv/byANcXKypSbKQAUvhYHlqeN3BVoE=
+github.com/shogo82148/aws-xray-yasdk-go v1.7.3/go.mod h1:Ou0BdxWM2H5u5FAcTqYUn08XSv+opM56jDULW8MLCRA=
 github.com/shogo82148/aws-xray-yasdk-go/xrayaws-v2 v1.1.5 h1:phDJkxMSjh9tuGdlzGio8i0syGLRr9Xipye57mdEjXo=
 github.com/shogo82148/aws-xray-yasdk-go/xrayaws-v2 v1.1.5/go.mod h1:it6dc2NdxQPhZuA50hgDJNzIzQaf44grfZTJP9op67s=
 github.com/shogo82148/go-http-logger v1.3.0 h1:4mTca6oyIXZrBXVrwzCdu3oWzI8r8aaBbM7sTsZituk=
