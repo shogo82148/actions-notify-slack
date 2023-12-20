@@ -3,7 +3,7 @@ module github.com/shogo82148/actions-notify-slack/gha-notify
 go 1.21.1
 
 require (
-	github.com/aws/aws-lambda-go v1.42.0
+	github.com/aws/aws-lambda-go v1.43.0
 	github.com/aws/aws-sdk-go-v2 v1.24.0
 	github.com/aws/aws-sdk-go-v2/config v1.26.1
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.26.6
