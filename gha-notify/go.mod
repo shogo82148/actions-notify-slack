@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.26.8
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.49.7
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.44.7
-	github.com/shogo82148/aws-xray-yasdk-go v1.7.4
+	github.com/shogo82148/aws-xray-yasdk-go v1.8.0
 	github.com/shogo82148/aws-xray-yasdk-go/xrayaws-v2 v1.1.8
 	github.com/shogo82148/go-http-logger v1.3.0
 	github.com/shogo82148/goat v0.0.6
@@ -34,6 +34,7 @@ require (
 	github.com/aws/smithy-go v1.19.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/shogo82148/forwarded-header v0.1.0 // indirect
 	github.com/shogo82148/pointer v1.3.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
