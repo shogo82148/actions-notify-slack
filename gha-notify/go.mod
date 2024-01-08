@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.49.7
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.44.7
 	github.com/shogo82148/aws-xray-yasdk-go v1.8.0
-	github.com/shogo82148/aws-xray-yasdk-go/xrayaws-v2 v1.1.8
+	github.com/shogo82148/aws-xray-yasdk-go/xrayaws-v2 v1.1.9
 	github.com/shogo82148/go-http-logger v1.3.0
 	github.com/shogo82148/goat v0.0.6
 	github.com/shogo82148/memoize v0.0.4
