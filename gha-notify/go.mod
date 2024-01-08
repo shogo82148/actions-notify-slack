@@ -12,7 +12,7 @@ require (
 	github.com/shogo82148/aws-xray-yasdk-go v1.8.0
 	github.com/shogo82148/aws-xray-yasdk-go/xrayaws-v2 v1.1.9
 	github.com/shogo82148/go-http-logger v1.3.0
-	github.com/shogo82148/goat v0.0.6
+	github.com/shogo82148/goat v0.1.0
 	github.com/shogo82148/memoize v0.0.4
 	github.com/shogo82148/ridgenative v1.4.0
 	github.com/slack-go/slack v0.12.3
@@ -35,7 +35,6 @@ require (
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/shogo82148/forwarded-header v0.1.0 // indirect
-	github.com/shogo82148/pointer v1.3.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 )
