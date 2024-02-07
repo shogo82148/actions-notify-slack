@@ -14,7 +14,7 @@ require (
 	github.com/shogo82148/go-http-logger v1.3.0
 	github.com/shogo82148/goat v0.1.0
 	github.com/shogo82148/memoize v0.0.4
-	github.com/shogo82148/ridgenative v1.4.0
+	github.com/shogo82148/ridgenative v1.5.0
 	github.com/slack-go/slack v0.12.3
 )
 
