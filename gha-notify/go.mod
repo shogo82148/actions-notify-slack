@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.27.7
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.30.4
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.53.2
-	github.com/aws/aws-sdk-go-v2/service/ssm v1.49.2
+	github.com/aws/aws-sdk-go-v2/service/ssm v1.49.3
 	github.com/shogo82148/aws-xray-yasdk-go v1.8.0
 	github.com/shogo82148/aws-xray-yasdk-go/xrayaws-v2 v1.1.9
 	github.com/shogo82148/go-http-logger v1.3.0
