@@ -15,7 +15,7 @@ require (
 	github.com/shogo82148/goat v0.1.0
 	github.com/shogo82148/memoize v0.1.0
 	github.com/shogo82148/ridgenative v1.5.0
-	github.com/slack-go/slack v0.12.5
+	github.com/slack-go/slack v0.14.0
 )
 
 require (
