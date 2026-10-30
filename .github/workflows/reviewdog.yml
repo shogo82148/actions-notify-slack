@@ -4,22 +4,22 @@ jobs:
   actionlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: reviewdog/action-actionlint@v1
+      - uses: actions/checkout@v4.4.0
+      - uses: reviewdog/action-actionlint@v1.81.1
 
   eslint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.4.0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4.4.0
         with:
           node-version-file: "action/package.json"
           cache-dependency-path: "action/package-lock.json"
           cache: "npm"
       - run: npm ci
         working-directory: action
-      - uses: reviewdog/action-eslint@v1
+      - uses: reviewdog/action-eslint@v1.36.1
         with:
           reporter: github-pr-review
           level: warning
